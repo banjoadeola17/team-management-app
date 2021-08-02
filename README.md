@@ -2,16 +2,16 @@
 
 Implementation of a GraphQl project with Node.Js for managing team members.
 
-# Author - Adeola Victor Banjo (banjoadeola17@gmail.com)
+## Author - Adeola Victor Banjo (banjoadeola17@gmail.com)
 
-# Framework and Technologies
+## Framework and Technologies
 - Node.js
 - GraphQl
 - Apollo-server
 - Docker
 - MongodDb
 
-# Project Features
+## Project Features
 The project was implemented to manage Members and Tags. The operations that could be performed on tags and members include
 - Create, Read, Update and Delete Members
 - Create, Read, Update and Delete Tags
@@ -20,7 +20,7 @@ The project was implemented to manage Members and Tags. The operations that coul
 
 The project runs on node.js, v14.15.0. Hence, you must have node.js (version 14 or higher) installed on your machine to run the application.
 
-# Project Structure
+## Project Structure
 The project is structured as follows
 - Src Folder - Houses the other folders and files for the project implementation
     - Controllers - Call the validation and services functions, and direct them to the resolvers
@@ -28,40 +28,43 @@ The project is structured as follows
     - Model - Contain the database models
     - Services - Contain the actual functions for the CRUD implementations for members and tags
     - Resolvers - House the functions that call the controller functions
-    - Util - Contains the utilities in the application
     - Validations - validates the request bodies that is received
     - resolvers.js - Used for exporting the resolvers
     - schema.js - Houses the graphql schema definitions
 - app.js - The index file that starts the graphql server and connects database
 - Dockerfile - Contains the docker set up for the project
 
-# Project set up
+## Project set up
 Clone the project from the Github repository https://github.com/banjoadeola17/team-management-app.git
 
 Install dependencies - npm install
 
+Then enter "npm start" to start the application
+
 GraphQl server would have started with the followin message logged
-Graphql Server ready at http://localhost:4000/
+"Graphql Server ready at http://localhost:4000/"
 
 You can then access the URL "http://localhost:4000" on your browser to query the endpoints.
 
 ## Queries
-# Tags
+### Tags
 
 - Fetch details of a single tag
 
 Request payload
 
+```
 query {
   tagById(tagId: "6104a60901e5436529cb5fad") {
     tagName
     tagDetails
   }
 }
+```
 
 Response format
 
-{
+```
   "data": {
     "tagById": {
       "tagName": "Java",
@@ -69,20 +72,20 @@ Response format
     }
   }
 }
-
+```
 -Fetch all tags
 
 Request payload
-
+```
 query {
   getTags {
     tagName
     tagDetails
   }
 }
-
+```
 Response format
-
+```
 {
   "data": {
     "getTags": [
@@ -96,11 +99,11 @@ Response format
       }
    }
 }
-
+```
 # Members
 
 ## fetch a single member
-
+```
 query {
   memberById(memberId: "610348f91dbe35444ef1f3b1") {
     _id
@@ -114,8 +117,9 @@ query {
   }
   }
 }
-
+```
 response
+```
 {
   "data": {
     "memberById": {
@@ -134,10 +138,11 @@ response
     }
   }
 }
-
+```
 ##fetch all members
 
 Request body
+```
 query {
   getMembers {
   firstName
@@ -150,8 +155,9 @@ query {
   }
   }
 }
-
+```
 Response body
+```
 {
   "data": {
     "getMembers": [
@@ -172,7 +178,7 @@ Response body
     ]
   }
 }
-
+```
 
 ## Mutations
 
@@ -181,16 +187,16 @@ Response body
 - Create a tag
 
 Request payload
-
+```
 mutation {
   createTag (memberId: "610347e31770714429c1a4fc", tagInput: {tagName: "Java", tagDetails: "Employee responsible for java related issues"}) {
     tagName
     tagDetails
   }
 }
-
+```
 Response format
-
+```
 {
   "data": {
     "createTag": {
@@ -199,19 +205,20 @@ Response format
     }
   }
 }
-
+```
 - Update tag
 
 Request payload
-
+```
 mutation {
   updateTag (tagId: "6105433f09db0e7215cd1202", tagInput: {tagName: "Golang", tagDetails: "Employee responsible for Go related cases."}) {
     tagName
     tagDetails
   }
 }
-
+```
 Response format
+```
 {
   "data": {
     "updateTag": {
@@ -220,18 +227,18 @@ Response format
     }
   }
 }
-
+```
 - Delete tag
 
 Request payload
-
+```
 mutation {
   deleteTag (tagId: "6105433f09db0e7215cd1202", memberId: "610347e31770714429c1a4fc")
   }
 }
-
+```
 Response Format
-
+```
 {
   "data": {
     "deleteTag": {
@@ -240,10 +247,11 @@ Response Format
     }
   }
 }
-
+```
 # Members
 
 - Create a member
+```
 mutation {
 addMember(memberInput: {firstName: "adeola", lastName: "banjo", memberType: CONTRACTOR, role: "software engineer", contractDuration: 3}) {
   _id
@@ -256,7 +264,8 @@ addMember(memberInput: {firstName: "adeola", lastName: "banjo", memberType: CONT
   }
 }
 }
-
+```
+```
 {
   "data": {
     "addMember": {
@@ -269,9 +278,10 @@ addMember(memberInput: {firstName: "adeola", lastName: "banjo", memberType: CONT
     }
   }
 }
-
+```
 
 update member profile
+```
 mutation {
 updateMemberProfile(memberId: "61034957e557df4459aa5ee5", memberInput: {firstName: "victor", lastName: "adeola", memberType: EMPLOYEE, role: "backend engineer", contractDuration: 3}) {
   _id
@@ -284,7 +294,8 @@ updateMemberProfile(memberId: "61034957e557df4459aa5ee5", memberInput: {firstNam
   }
 }
 }
-
+```
+```
 {
   "data": {
     "updateMemberProfile": {
@@ -297,27 +308,28 @@ updateMemberProfile(memberId: "61034957e557df4459aa5ee5", memberInput: {firstNam
     }
   }
 }
-
+```
 - Delete member
 
 Request payload
-
+```
 mutation {
 deleteMember(memberId: "6103433619b2684380755814") {
   status
   message
 }
 }
-
+```
 Response format
-
-{
+```
   "data": {
     "deleteMember": {
       "status": true,
       "message": "Member successfully removed."
     }
   }
+}
+```
 }
 
 

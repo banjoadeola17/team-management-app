@@ -118,7 +118,7 @@ exports.removeMember = async (memberId) => {
 exports.getAllMembers = async () => {
   try {
     const activeMembers = await Member.find({}).populate("tags").exec();
-    if (members.length < 1) throw new Error("Member does not exist.");
+    if (activeMembers.length < 1) throw new Error("Member does not exist.");
 
     return activeMembers;
   } catch (error) {
