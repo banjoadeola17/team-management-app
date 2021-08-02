@@ -52,15 +52,18 @@ You can then access the URL "http://localhost:4000" on your browser to query the
 
 Request payload
 
+```bash
 query {
   tagById(tagId: "6104a60901e5436529cb5fad") {
     tagName
     tagDetails
   }
 }
+```
 
 Response format
 
+```bash
 {
   "data": {
     "tagById": {
@@ -69,20 +72,24 @@ Response format
     }
   }
 }
+```
 
 -Fetch all tags
 
 Request payload
 
+```bash
 query {
   getTags {
     tagName
     tagDetails
   }
 }
+```
 
 Response format
 
+```bash
 {
   "data": {
     "getTags": [
@@ -96,11 +103,13 @@ Response format
       }
    }
 }
+```
 
 # Members
 
 ## fetch a single member
 
+```bash
 query {
   memberById(memberId: "610348f91dbe35444ef1f3b1") {
     _id
@@ -114,8 +123,10 @@ query {
   }
   }
 }
+```
 
 response
+```bash
 {
   "data": {
     "memberById": {
@@ -134,9 +145,11 @@ response
     }
   }
 }
+```
 
 ##fetch all members
 
+```bash
 Request body
 query {
   getMembers {
@@ -150,8 +163,10 @@ query {
   }
   }
 }
+```
 
 Response body
+```bash
 {
   "data": {
     "getMembers": [
@@ -172,7 +187,7 @@ Response body
     ]
   }
 }
-
+```
 
 ## Mutations
 
@@ -182,15 +197,18 @@ Response body
 
 Request payload
 
+```bash
 mutation {
   createTag (memberId: "610347e31770714429c1a4fc", tagInput: {tagName: "Java", tagDetails: "Employee responsible for java related issues"}) {
     tagName
     tagDetails
   }
 }
+```
 
 Response format
 
+```bash
 {
   "data": {
     "createTag": {
@@ -199,19 +217,24 @@ Response format
     }
   }
 }
+```
 
 - Update tag
 
 Request payload
 
+```bash
 mutation {
   updateTag (tagId: "6105433f09db0e7215cd1202", tagInput: {tagName: "Golang", tagDetails: "Employee responsible for Go related cases."}) {
     tagName
     tagDetails
   }
 }
+```
 
 Response format
+
+```bash
 {
   "data": {
     "updateTag": {
@@ -220,18 +243,22 @@ Response format
     }
   }
 }
+```
 
 - Delete tag
 
 Request payload
 
+```bash
 mutation {
   deleteTag (tagId: "6105433f09db0e7215cd1202", memberId: "610347e31770714429c1a4fc")
   }
 }
+```
 
 Response Format
 
+```bash
 {
   "data": {
     "deleteTag": {
@@ -240,10 +267,13 @@ Response Format
     }
   }
 }
+```
 
 # Members
 
 - Create a member
+
+```bash
 mutation {
 addMember(memberInput: {firstName: "adeola", lastName: "banjo", memberType: CONTRACTOR, role: "software engineer", contractDuration: 3}) {
   _id
@@ -256,7 +286,10 @@ addMember(memberInput: {firstName: "adeola", lastName: "banjo", memberType: CONT
   }
 }
 }
+```
 
+Response structure
+```bash
 {
   "data": {
     "addMember": {
@@ -269,9 +302,11 @@ addMember(memberInput: {firstName: "adeola", lastName: "banjo", memberType: CONT
     }
   }
 }
-
+```
 
 update member profile
+
+```bash
 mutation {
 updateMemberProfile(memberId: "61034957e557df4459aa5ee5", memberInput: {firstName: "victor", lastName: "adeola", memberType: EMPLOYEE, role: "backend engineer", contractDuration: 3}) {
   _id
@@ -284,7 +319,10 @@ updateMemberProfile(memberId: "61034957e557df4459aa5ee5", memberInput: {firstNam
   }
 }
 }
+```
+Response tsructure
 
+```bash
 {
   "data": {
     "updateMemberProfile": {
@@ -297,20 +335,23 @@ updateMemberProfile(memberId: "61034957e557df4459aa5ee5", memberInput: {firstNam
     }
   }
 }
-
+```
 - Delete member
 
 Request payload
 
+```bash
 mutation {
 deleteMember(memberId: "6103433619b2684380755814") {
   status
   message
 }
 }
+```
 
 Response format
 
+```bash
 {
   "data": {
     "deleteMember": {
@@ -319,7 +360,7 @@ Response format
     }
   }
 }
-
+```
 
 ## FUTURE IMPROVEMENTS
 
