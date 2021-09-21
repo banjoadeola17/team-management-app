@@ -1,30 +1,46 @@
-const { ApolloError } = require("apollo-server");
 const { Tag } = require("../model/tag.model");
 const { Member } = require("../model/member.model");
 const logger = require("../logger/logger");
+const { OK, NOT_FOUND, CONFLICT } = require("../modules/status");
 
 exports.createTagForMember = async (memberId, tagInput) => {
   const { tagName, tagDetails } = tagInput;
 
   try {
-    //  Find member and set tag
-    const existingMember = await Member.findOne({ _id: memberId });
-
-    if (!existingMember) throw new Error("Member could not be found.");
-
+    const existingTag = await Tag.findOne({ tagName });
+    if (existingTag) {
+      return Promise.reject({
+        statusCode: CONFLICT,
+        message: "Tag already exist. Please try again.",
+      });
+    }
     const tag = new Tag({
       tagName,
       tagDetails,
     });
     await tag.save();
 
+    const existingMember = await Member.findOne({ _id: memberId });
+
+    if (!existingMember) {
+      return Promise.reject({
+        statusCode: NOT_FOUND,
+        message: "Member not found. Please try again.",
+      });
+    }
+
+    logger.info(
+      `::: Creating tag for member ${JSON.stringify(existingMember)} :::`
+    );
+
     existingMember.tags.push(tag);
     await existingMember.save();
-    return tag;
-  } catch (error) {
-    logger.error("Troubles creating new member.");
-    const err = new Error("Unable to create tag.")
-    throw err
+    return Promise.resolve(tag);
+  } catch (err) {
+    logger.error(
+      `Unable to create tag for member with Id ${JSON.stringify(memberId)}.`
+    );
+    return Promise.reject(err);
   }
 };
 
@@ -32,10 +48,14 @@ exports.updateTagForMember = async (tagId, tagInput) => {
   const { tagName, tagDetails } = tagInput;
 
   try {
-    // Find existing tag
     const existingTag = await Tag.findOne({ _id: tagId });
 
-    if (!existingTag) throw new Error("Tag does not exist.");
+    if (!existingTag) {
+      return Promise.reject({
+        statusCode: NOT_FOUND,
+        message: "Tag not found. Please try again.",
+      });
+    }
     return Tag.findOneAndUpdate(
       {
         _id: tagId,
@@ -48,10 +68,11 @@ exports.updateTagForMember = async (tagId, tagInput) => {
       },
       { new: true }
     );
-  } catch (error) {
-    logger.error("Troubles updating tag.");
-    const err = new Error("Could not update tag.")
-    throw err
+  } catch (err) {
+    logger.error("Errors updating tag.");
+    // const error = new Error("Unable to create new member");
+    // throw error;
+    return Promise.reject(err);
   }
 };
 
@@ -59,43 +80,63 @@ exports.deleteTagForMember = async (tagId, memberId) => {
   try {
     const existingTag = await Tag.findOne({ _id: tagId });
 
-    if (!existingTag) throw new Error("Tag does not exist.");
+    if (!existingTag) {
+      return Promise.reject({
+        statusCode: NOT_FOUND,
+        message: "Tag not found. Please try again.",
+      });
+    }
 
     const deletedTag = await Tag.findByIdAndRemove({ _id: tagId });
 
     const tagOwner = await Member.findOne({ _id: memberId });
-    if(!tagOwner) throw new Error("Member not found.");
+    if (!tagOwner) {
+      return Promise.reject({
+        statusCode: NOT_FOUND,
+        message: "Member not found. Please try again.",
+      });
+    }
     tagOwner.tags.pull(tagId);
     await tagOwner.save();
 
     return { status: true, message: "Tag successfully removed." };
-  } catch (error) {
+  } catch (err) {
     logger.error("Unable to delete tag.");
-    const err = new Error("Unable to delete tag.")
-    throw err
+    return Promise.reject(err);
   }
 };
 
 exports.getAllTags = async () => {
   try {
     const tags = await Tag.find({});
-    if (tags.length < 1) throw new Error("Tag does not exist.");
-    return tags;
-  } catch (error) {
+    if (tags.length < 1) {
+      return Promise.reject({
+        statusCode: NOT_FOUND,
+        message: "Tags not found. Please try again later.",
+      });
+    }
+    return Promise.resolve(tags);
+  } catch (err) {
     logger.error("Unable to fetch tags.");
-    const err = new Error("Could not fetch tags.")
-    throw err
+    return Promise.reject(err);
   }
 };
 
 exports.getSingleTag = async (tagId) => {
   try {
     const tag = await Tag.findOne({ _id: tagId });
-    if (!tag) throw new Error("Tag does not exist.");
-    return tag;
-  } catch (error) {
-    logger.error("Troubles fetching tag.");
-    const err = new Error("Could not fetch tags.")
-    throw err
+
+    if (!tag) {
+      return Promise.reject({
+        statusCode: NOT_FOUND,
+        message: "Tag not found. Please try again later.",
+      });
+    }
+    return Promise.resolve(tag);
+  } catch (err) {
+    logger.error(
+      `::: Unable to fecth tag with Id ${JSON.stringify(tagId)} :::`
+    );
+    return Promise.reject(err);
   }
 };

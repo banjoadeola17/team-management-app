@@ -1,5 +1,4 @@
 const { ApolloServer, ApolloError } = require("apollo-server");
-const mongoose = require("mongoose");
 const logger = require("./src/logger/logger");
 const dotenv = require("dotenv");
 const typeDefs = require("./src/schema");
@@ -14,7 +13,7 @@ const server = new ApolloServer({
   debug: false,
   formatError: (err) => {
     if (err.extensions.code === "INTERNAL_SERVER_ERROR") {
-      return new ApolloError("Internal server error.", "ERROR");
+      return new ApolloError("Internal server error.", "INTERNAL_SERVER_ERROR");
     }
     return err;
   },
@@ -26,11 +25,11 @@ const port = process.env.PORT || 4000;
   try {
     await mongoConnection();
     server.listen(port, async () => {
-      console.log(`Server started on port: ${port}`)
-      console.log(`GraphQl server ready at localhost:${port}/graphql`)
+      logger.info(`Server running on port: ${port}`)
+      logger.info(`GraphQl server ready at localhost:${port}/graphql`)
     });
 
   } catch (error) {
-    console.log('Mongo connection error', error)
+    logger.error('Mongo connection error', error)
   }
 })()

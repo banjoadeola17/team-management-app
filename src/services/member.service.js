@@ -2,6 +2,7 @@ const { Member } = require("../model/member.model");
 const { Tag } = require("../model/tag.model");
 const { MemberType } = require("../model/member.type");
 const logger = require("../logger/logger");
+const { OK, NOT_FOUND, CONFLICT } = require("../modules/status");
 
 exports.addNewMember = async (memberInput) => {
   const { memberType } = memberInput;
@@ -13,10 +14,11 @@ exports.addNewMember = async (memberInput) => {
     if (memberType === MemberType.CONTRACTOR) {
       return createContractor(memberInput);
     }
-  } catch (error) {
-    logger.error("Could not create new member.");
-    const err = new Error("Unable to create new member")
-    throw err
+  } catch (err) {
+    logger.error(
+      `Could not create new member with error [${JSON.stringify(err)}]`
+    );
+    return Promise.reject(err);
   }
 };
 
@@ -48,7 +50,12 @@ exports.updateMember = async (args) => {
   const { memberType } = memberInput;
   try {
     const existingMember = await Member.findOne({ _id: memberId });
-    if (!existingMember) throw new Error("Member does not exist.");
+    if (!existingMember) {
+      return Promise.reject({
+        statusCode: NOT_FOUND,
+        message: "Member not found. Please try again.",
+      });
+    }
     if (memberType === MemberType.EMPLOYEE) {
       return updateEmployee(memberId, memberInput);
     }
@@ -57,8 +64,7 @@ exports.updateMember = async (args) => {
     }
   } catch (error) {
     logger.error("Troubles updating member details.");
-    const err = new Error("Unable to create new member")
-    throw err
+    return Promise.reject(err);
   }
 };
 
@@ -102,38 +108,54 @@ async function updateContractor(memberId, memberInput) {
 exports.removeMember = async (memberId) => {
   try {
     const existingMember = await Member.findOne({ _id: memberId });
-    if (!existingMember) throw new Error("Member does not exist.");
+    if (!existingMember) {
+      return Promise.reject({
+        statusCode: NOT_FOUND,
+        message: "Member not found. Please try again.",
+      });
+    }
 
-    const deletedMember = await Member.findByIdAndRemove({ _id: memberId });
+    await Member.findByIdAndRemove({ _id: memberId });
 
     return { status: true, message: "Member successfully removed." };
-
   } catch (error) {
     logger.error(`Unable to delete member with id ${memberId}.`);
-    const err = new Error("Unable to delete tag.")
-    throw err
+    return Promise.reject(err);
   }
 };
 
 exports.getAllMembers = async () => {
   try {
     const activeMembers = await Member.find({}).populate("tags").exec();
-    if (activeMembers.length < 1) throw new Error("Member does not exist.");
+    if (activeMembers.length < 1) {
+      return Promise.reject({
+        statusCode: NOT_FOUND,
+        message: "Members not found. Please try again.",
+      });
+    }
 
-    return activeMembers;
-  } catch (error) {
+    return Promise.resolve(activeMembers);
+  } catch (err) {
     logger.error("Unable to fetch members.");
-    const err = new Error("Unable to fetch members.")
-    throw err
+    return Promise.reject(err);
   }
 };
 
 exports.getSingleMember = async (memberId) => {
   try {
-    return Member.findOne({ _id: memberId }).populate("tags").exec();
-  } catch (error) {
-    logger.error("Unable to fetch member.");
-    const err = new Error("Unable to delete tag.")
-    throw err
+    const member = await Member.findOne({ _id: memberId })
+      .populate("tags")
+      .exec();
+
+    if (!member) {
+      return Promise.reject({
+        statusCode: NOT_FOUND,
+        message: "Member not found. Please try again.",
+      });
+    }
+    return Promise.resolve(member);
+  } catch (err) {
+    logger.error(`Unable to fetch member with error ${JSON.stringify(err)}`);
+    return Promise.reject(err);
   }
 };

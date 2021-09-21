@@ -23,6 +23,7 @@ module.exports = gql`
     tagName: String!
     tagDetails: String!
   }
+  
 
   input MemberInputData {
     firstName: String!
@@ -37,7 +38,7 @@ module.exports = gql`
     tagDetails: String!
   }
   
-  type DeleteResponse {
+  type DeletetionResponse {
     status: Boolean!
     message: String!
   }
@@ -51,10 +52,10 @@ module.exports = gql`
 
   type Mutation {
     addMember(memberInput: MemberInputData!): Member!
-    deleteMember(memberId: ID!): DeleteResponse!
+    deleteMember(memberId: ID!): DeletetionResponse!
     updateMemberProfile(memberId: ID!, memberInput: MemberInputData!): Member!
     createTag(memberId: ID!, tagInput: TagInputData!): Tag!
     updateTag(tagId: ID!, tagInput: TagInputData!): Tag!
-    deleteTag(tagId:ID!, memberId: ID!): DeleteResponse!
+    deleteTag(tagId:ID!, memberId: ID!): DeletetionResponse!
   }
 `;

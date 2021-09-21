@@ -21,9 +21,9 @@ exports.setTagForMember = async (memberId, tagInput) => {
       throw new Error(validateTagInput.error.details[0].message);
 
     let createdTag = await createTagForMember(memberId, tagInput);
-    return createdTag;
+    return Promise.resolve(createdTag);
   } catch (err) {
-    return new ApolloError("Unable to create tag for member", "TAG_ERROR");
+    return new ApolloError("Unable to create tag for member", "CREATE_TAG_ERROR");
   }
 };
 
@@ -36,9 +36,9 @@ exports.editTag = async (tagId, tagInput) => {
       throw new Error(validateTagInput.error.details[0].message);
 
     const updatedTag = await updateTagForMember(tagId, tagInput);
-    return updatedTag;
+    return Promise.resolve(updatedTag);
   } catch (err) {
-    return new ApolloError("Unable to update tag.", "TAG_ERROR");
+    return new ApolloError("Unable to update tag.", "EDIT_TAG_ERROR");
   }
 };
 
@@ -48,10 +48,9 @@ exports.removeTag = async (tagId, memberId) => {
   );
 
   try {
-    const deletedTag = await deleteTagForMember(tagId, memberId);
-    return { status: true, message: "Tag successfully removed." };
+    return await deleteTagForMember(tagId, memberId);
   } catch (err) {
-    return new ApolloError("Unable to remove tag.", "TAG_ERROR");
+    return new ApolloError("Unable to remove tag.", "REMOVE_TAG_ERROR");
   }
 };
 
@@ -60,19 +59,19 @@ exports.fetchTags = async () => {
 
   try {
     const tags = await getAllTags();
-    return tags;
+    return Promise.resolve(tags);
   } catch (err) {
-    return new ApolloError("Unable to fetch tags.", "TAG_ERROR");
+    return new ApolloError("Unable to fetch tags.", "FETCH_TAGS_ERROR");
   }
 };
 
 exports.fetchTag = async (tagId) => {
-  logger.info(`Fetching tag ${tagId}`);
+  logger.info(`Fetching tag with id ${tagId}`);
 
   try {
     const tag = await getSingleTag(tagId);
-    return tag;
+    return Promise.resolve(tag);
   } catch (err) {
-    return new ApolloError("Unable to fetch tag.", "TAG_ERROR");
+    return new ApolloError("Unable to fetch tag.", "FETCH_TAG_ERROR");
   }
 };

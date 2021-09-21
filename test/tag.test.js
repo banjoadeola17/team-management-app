@@ -8,42 +8,47 @@ const { Tag } = require("../src/model/tag.model");
 const {
   createTagForMember,
   getSingleTag,
+  updateTagForMember,
 } = require("../src/services/tag.service");
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe("Tag Service Tests", function () {
-  it("should create tag for member.", async function () {
-    const memberId = "uydy287hsn";
-    const tagInput = {
-      tagName: "Java",
-      tagDetails: "Java details",
-    };
+  const memberId = "randomMemberId";
 
-    const { tagName, tagDetails } = tagInput;
+  const tagId = "randomTagId";
 
-    const member = sinon.stub(Member, "findOne").resolves({ _id: memberId });
-
-    sinon.stub(Tag.prototype, "save").resolves({
-      tagName,
-      tagDetails,
-    });
-
-    const response = await createTagForMember(memberId, tagInput);
-
-    member.restore();
-    sinon.assert.calledOnce(member);
-  });
+  const tagInput = {
+    tagName: "Java",
+    tagDetails: "Java details",
+  };
 
   it("should successfully fetch a single tag", async function () {
-    const tagId = "bhgvytk";
-
     const findOneTag = sinon.stub(Tag, "findOne").resolves({ _id: tagId });
 
-    const response = await getSingleTag({tagId});
+    const response = await getSingleTag({ tagId });
+
+    expect(response).to.exist;
 
     findOneTag.restore();
     sinon.assert.calledOnce(findOneTag);
+  });
+
+  it("should update tag for member", async function () {
+    const findOneTag = sinon.stub(Tag, "findOne").resolves({ _id: tagId });
+
+    const updatedTag = sinon.stub(Tag, "findOneAndUpdate");
+    updatedTag.resolves(tagInput);
+
+    const response = await updateTagForMember(tagId, tagInput);
+
+    expect(response).to.exist;
+
+    findOneTag.restore();
+    sinon.assert.calledOnce(findOneTag);
+
+    updatedTag.restore();
+    sinon.assert.calledOnce(updatedTag);
   });
 });

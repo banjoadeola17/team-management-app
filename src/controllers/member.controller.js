@@ -1,4 +1,4 @@
-const { ApolloError } = require("apollo-server");
+const { ApolloError, ValidationError } = require("apollo-server");
 const {
   addNewMember,
   updateMember,
@@ -11,24 +11,25 @@ const logger = require("../logger/logger");
 
 exports.createMember = async (memberInput) => {
   logger.info(
-    `Adding new member with input data ${JSON.stringify(memberInput)} `
+    `::: Creating new member with input data ${JSON.stringify(memberInput)} :::`
   );
   try {
     const validateMemberInput = validateMemberSchema(memberInput);
 
     if (validateMemberInput.error)
-      throw new Error(validateMemberInput.error.details[0].message);
+      throw new Error(
+        validateMemberInput.error.details[0].message
+      );
 
     const member = await addNewMember(memberInput);
     return member;
   } catch (err) {
-
-    return new ApolloError("Unable to create new member.", "MEMBER_ERROR");
+    return new ApolloError("Unable to create new member.", "ADD_MEMBER_ERROR");
   }
 };
 
 exports.editMemberProfile = async (args) => {
-  logger.info(`Updating data for member with id ${args.memberId}`);
+  logger.info(`::: Updating data for member with id ${args.memberId} :::`);
   try {
     const { memberInput } = args;
     const validateMemberInput = validateMemberSchema(memberInput);
@@ -47,12 +48,11 @@ exports.editMemberProfile = async (args) => {
 };
 
 exports.deleteMemberProfile = async (memberId) => {
-  logger.info(`Removing data for member with id ${memberId}`);
+  logger.info(`::: Deleting member with id ${memberId} :::`);
   try {
-    const deletedMember = await removeMember(memberId);
-    return { status: true, message: "Member successfully removed." };
+    return await removeMember(memberId);
   } catch (error) {
-    return new ApolloError("Unable to delet member.", "MEMBER_ERROR");
+    return new ApolloError("Unable to delete member.", "DELETE_MEMBER_ERROR");
   }
 };
 
@@ -62,16 +62,17 @@ exports.fetchMembers = async () => {
     const members = await getAllMembers();
     return members;
   } catch (error) {
-    return new ApolloError("Cannot fetch members.", "MEMBER_ERROR");
+    return new ApolloError("Unable to fetch members. Please try again", "FETCH_MEMBERS_ERROR");
   }
 };
 
 exports.fetchMember = async (memberId) => {
-  logger.info(`Fetch single member with id ${memberId}`);
+  logger.info(`::: Fetching member with id ${memberId} :::`);
   try {
     const member = await getSingleMember(memberId);
     return member;
   } catch (error) {
-    return new ApolloError("Cannot fetch member.", "MEMBER_ERROR");
+    console.log("error", error)
+    return new ApolloError("Unable to fetch member. Please try again", "MEMBER_BY_ID_ERROR");
   }
 };
