@@ -36,7 +36,6 @@ describe("Tag Service Tests", function () {
   });
 
   it("should update tag for member", async function () {
-    const findOneTag = sinon.stub(Tag, "findOne").resolves({ _id: tagId });
 
     const updatedTag = sinon.stub(Tag, "findOneAndUpdate");
     updatedTag.resolves(tagInput);
@@ -44,9 +43,6 @@ describe("Tag Service Tests", function () {
     const response = await updateTagForMember(tagId, tagInput);
 
     expect(response).to.exist;
-
-    findOneTag.restore();
-    sinon.assert.calledOnce(findOneTag);
 
     updatedTag.restore();
     sinon.assert.calledOnce(updatedTag);

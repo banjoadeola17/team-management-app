@@ -48,30 +48,17 @@ exports.updateTagForMember = async (tagId, tagInput) => {
   const { tagName, tagDetails } = tagInput;
 
   try {
-    const existingTag = await Tag.findOne({ _id: tagId });
-
-    if (!existingTag) {
-      return Promise.reject({
-        statusCode: NOT_FOUND,
-        message: "Tag not found. Please try again.",
-      });
-    }
     return Tag.findOneAndUpdate(
       {
         _id: tagId,
       },
       {
-        $set: {
-          tagName,
-          tagDetails,
-        },
+        $set: {...tagInput},
       },
       { new: true }
     );
   } catch (err) {
     logger.error("Errors updating tag.");
-    // const error = new Error("Unable to create new member");
-    // throw error;
     return Promise.reject(err);
   }
 };
@@ -87,7 +74,7 @@ exports.deleteTagForMember = async (tagId, memberId) => {
       });
     }
 
-    const deletedTag = await Tag.findByIdAndRemove({ _id: tagId });
+    await Tag.findByIdAndRemove({ _id: tagId });
 
     const tagOwner = await Member.findOne({ _id: memberId });
     if (!tagOwner) {

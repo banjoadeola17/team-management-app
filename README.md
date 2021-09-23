@@ -368,11 +368,17 @@ Response format
 ## FUTURE IMPROVEMENTS
 
 The implementation considers the basic CRUD operation for members and tags. However, further improvements, 
-if implemented would ensure a robust and a more effective team management managemnet.
-The improvemement that could be considered include;
+if implemented would ensure a robust and a more effective management of the team.
+
+The improvemements that could be considered include;
+
+* Introducing the repository layer into the project structre to hold operations involving database.
+This makes the code structure to be more loosely coupled and assist to achieve dependency injection.
 
 * Implementation of authentication and authorization (e.g with jwt and assigning roles to members) across the application. With this, only the authorized members can create/ set tags, 
 delete tags and carry out other restrictive functions across the application.
+
+* User context to inject the authenticated user into the resolvers for use.
 
 * Write more of unit and integration tests cases to cover all the functions in the application.
 This would help to properly track changes and breaks within the application.

@@ -49,13 +49,6 @@ exports.updateMember = async (args) => {
   const { memberId, memberInput } = args;
   const { memberType } = memberInput;
   try {
-    const existingMember = await Member.findOne({ _id: memberId });
-    if (!existingMember) {
-      return Promise.reject({
-        statusCode: NOT_FOUND,
-        message: "Member not found. Please try again.",
-      });
-    }
     if (memberType === MemberType.EMPLOYEE) {
       return updateEmployee(memberId, memberInput);
     }
@@ -64,42 +57,29 @@ exports.updateMember = async (args) => {
     }
   } catch (error) {
     logger.error("Troubles updating member details.");
-    return Promise.reject(err);
+    return Promise.reject(error);
   }
 };
 
 async function updateEmployee(memberId, memberInput) {
-  const { firstName, lastName, memberType, role } = memberInput;
   return Member.findOneAndUpdate(
     {
       _id: memberId,
     },
     {
-      $set: {
-        firstName,
-        lastName,
-        memberType,
-        role,
-      },
+      $set: { ...memberInput },
     },
     { new: true }
   );
 }
 
 async function updateContractor(memberId, memberInput) {
-  const { firstName, lastName, memberType, contractDuration } = memberInput;
-
   return Member.findOneAndUpdate(
     {
       _id: memberId,
     },
     {
-      $set: {
-        firstName,
-        lastName,
-        memberType,
-        contractDuration,
-      },
+      $set: { ...memberInput },
     },
     { new: true }
   );

@@ -24,7 +24,7 @@ describe("Member Service Tests", function () {
     contractDuration: "2 months",
   };
 
-  it("should create new member.", async function () {
+  it("should create new member if the input meets the defined schema.", async function () {
     sinon.stub(Member.prototype, "save").resolves({ memberInput });
 
     const response = await addNewMember(memberInput);
@@ -32,16 +32,23 @@ describe("Member Service Tests", function () {
     expect(response).to.exist;
   });
 
-  it("should successfully update tag for member", async function () {
-    const { memberType } = memberInput;
-    const findOneMember = sinon.stub(Member, "findOne").resolves({
-      _id: memberId,
+  it("should fail to create new member if member type is not specified.", async function () {
+    const memberInputForFailure = {
       firstName: "Dummy",
       lastName: "Dummy",
-      memberType: "EMPLOYEE",
-      tags: [],
       role: "role",
-    });
+      memberType: null,
+      contractDuration: "2 months",
+    };
+
+    try {
+    } catch (err) {
+      await addNewMember(memberInputForFailure);
+    }
+  });
+
+  it("should successfully update tag for member", async function () {
+    const { memberType } = memberInput;
 
     const updatedMember = sinon.stub(Member, "findOneAndUpdate");
     updatedMember.resolves({
@@ -55,9 +62,6 @@ describe("Member Service Tests", function () {
 
     expect(response).to.exist;
     expect(response).to.have.property("tags");
-
-    findOneMember.restore();
-    sinon.assert.calledOnce(findOneMember);
 
     updatedMember.restore();
     sinon.assert.calledOnce(updatedMember);
