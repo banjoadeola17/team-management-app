@@ -72,7 +72,7 @@ exports.fetchMember = async (memberId) => {
     const member = await getSingleMember(memberId);
     return member;
   } catch (error) {
-    console.log("error", error)
+
     return new ApolloError("Unable to fetch member. Please try again", "MEMBER_BY_ID_ERROR");
   }
 };

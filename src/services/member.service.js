@@ -4,6 +4,11 @@ const { MemberType } = require("../model/member.type");
 const logger = require("../logger/logger");
 const { OK, NOT_FOUND, CONFLICT } = require("../modules/status");
 
+/**
+ * Create a member
+ * @param {Object} memberInput - input object to be created
+ * @returns {Object} createdMember
+ */
 exports.addNewMember = async (memberInput) => {
   const { memberType } = memberInput;
   try {
@@ -45,6 +50,11 @@ async function createContractor({
   }).save();
 }
 
+/**
+ * Update a member
+ * @param {Object} args - member args object to be updated
+ * @returns {Object} updatedMember
+ */
 exports.updateMember = async (args) => {
   const { memberId, memberInput } = args;
   const { memberType } = memberInput;
@@ -85,15 +95,16 @@ async function updateContractor(memberId, memberInput) {
   );
 }
 
+/**
+ * Delete a member
+ * @param {Object} memberId - memberId object to be deleted
+ * @returns {Object} deletion response
+ */
 exports.removeMember = async (memberId) => {
   try {
     const existingMember = await Member.findOne({ _id: memberId });
-    if (!existingMember) {
-      return Promise.reject({
-        statusCode: NOT_FOUND,
-        message: "Member not found. Please try again.",
-      });
-    }
+    if (!existingMember)
+      throw new Error("Member not found. Please try again later.");
 
     await Member.findByIdAndRemove({ _id: memberId });
 
@@ -104,15 +115,15 @@ exports.removeMember = async (memberId) => {
   }
 };
 
+/**
+ * fetch all members
+ * @returns {Object} members
+ */
 exports.getAllMembers = async () => {
   try {
     const activeMembers = await Member.find({}).populate("tags").exec();
-    if (activeMembers.length < 1) {
-      return Promise.reject({
-        statusCode: NOT_FOUND,
-        message: "Members not found. Please try again.",
-      });
-    }
+    if (activeMembers.length < 1)
+      throw new Error("Members not found. Please try again.");
 
     return Promise.resolve(activeMembers);
   } catch (err) {
@@ -121,18 +132,19 @@ exports.getAllMembers = async () => {
   }
 };
 
+/**
+ * Get one member
+ * @param {Object} memberId - memberId object to be fetched
+ * @returns {Object} member
+ */
 exports.getSingleMember = async (memberId) => {
   try {
     const member = await Member.findOne({ _id: memberId })
       .populate("tags")
       .exec();
 
-    if (!member) {
-      return Promise.reject({
-        statusCode: NOT_FOUND,
-        message: "Member not found. Please try again.",
-      });
-    }
+    if (!member) throw new Error("Member not found. Please try again.");
+
     return Promise.resolve(member);
   } catch (err) {
     logger.error(`Unable to fetch member with error ${JSON.stringify(err)}`);

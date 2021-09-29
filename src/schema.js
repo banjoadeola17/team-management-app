@@ -22,6 +22,8 @@ module.exports = gql`
     _id: ID!
     tagName: String!
     tagDetails: String!
+    createdAt: String!
+    updatedAt: String!
   }
   
 

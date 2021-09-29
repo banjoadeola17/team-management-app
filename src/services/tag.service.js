@@ -3,17 +3,19 @@ const { Member } = require("../model/member.model");
 const logger = require("../logger/logger");
 const { OK, NOT_FOUND, CONFLICT } = require("../modules/status");
 
+/**
+ * Create a tag
+ * @param {Object} memberId - member object to create tag for
+ * @param {Object} tagInput - input tag object to be created
+ * @returns {Object} createdTag
+ */
 exports.createTagForMember = async (memberId, tagInput) => {
   const { tagName, tagDetails } = tagInput;
 
   try {
     const existingTag = await Tag.findOne({ tagName });
-    if (existingTag) {
-      return Promise.reject({
-        statusCode: CONFLICT,
-        message: "Tag already exist. Please try again.",
-      });
-    }
+    if (existingTag) throw new Error("Tag already exist. Please try again");
+
     const tag = new Tag({
       tagName,
       tagDetails,
@@ -22,12 +24,7 @@ exports.createTagForMember = async (memberId, tagInput) => {
 
     const existingMember = await Member.findOne({ _id: memberId });
 
-    if (!existingMember) {
-      return Promise.reject({
-        statusCode: NOT_FOUND,
-        message: "Member not found. Please try again.",
-      });
-    }
+    if (!existingMember) throw new Error("Could not find member.");
 
     logger.info(
       `::: Creating tag for member ${JSON.stringify(existingMember)} :::`
@@ -44,6 +41,12 @@ exports.createTagForMember = async (memberId, tagInput) => {
   }
 };
 
+/**
+ * Update a tag
+ * @param {Object} tagId - tagId object to be updated
+ * @param {Object} tagInput - input tag object to be updated
+ * @returns {Object} updatedTag
+ */
 exports.updateTagForMember = async (tagId, tagInput) => {
   const { tagName, tagDetails } = tagInput;
 
@@ -53,7 +56,7 @@ exports.updateTagForMember = async (tagId, tagInput) => {
         _id: tagId,
       },
       {
-        $set: {...tagInput},
+        $set: { ...tagInput },
       },
       { new: true }
     );
@@ -63,26 +66,23 @@ exports.updateTagForMember = async (tagId, tagInput) => {
   }
 };
 
+/**
+ * Delete a tag
+ * @param {Object} memberId - memberId object of tag owner
+ * @param {Object} tagId - tag Id object to be deleted
+ * @returns {Object} deletion response
+ */
 exports.deleteTagForMember = async (tagId, memberId) => {
   try {
     const existingTag = await Tag.findOne({ _id: tagId });
 
-    if (!existingTag) {
-      return Promise.reject({
-        statusCode: NOT_FOUND,
-        message: "Tag not found. Please try again.",
-      });
-    }
+    if (!existingTag) throw new Error("Tag not found. Please try again.");
 
     await Tag.findByIdAndRemove({ _id: tagId });
 
     const tagOwner = await Member.findOne({ _id: memberId });
-    if (!tagOwner) {
-      return Promise.reject({
-        statusCode: NOT_FOUND,
-        message: "Member not found. Please try again.",
-      });
-    }
+    if (!tagOwner) throw new Error("Member not found. Please try again.");
+
     tagOwner.tags.pull(tagId);
     await tagOwner.save();
 
@@ -93,15 +93,16 @@ exports.deleteTagForMember = async (tagId, memberId) => {
   }
 };
 
+/**
+ * fetch all tags
+ * @returns {Object} tags
+ */
 exports.getAllTags = async () => {
   try {
     const tags = await Tag.find({});
-    if (tags.length < 1) {
-      return Promise.reject({
-        statusCode: NOT_FOUND,
-        message: "Tags not found. Please try again later.",
-      });
-    }
+    if (tags.length < 1)
+      throw new Error("Tags not found. Please try again later.");
+
     return Promise.resolve(tags);
   } catch (err) {
     logger.error("Unable to fetch tags.");
@@ -109,16 +110,17 @@ exports.getAllTags = async () => {
   }
 };
 
+/**
+ * Get a single tag
+ * @param {Object} tagId - tag Id object to be fetched
+ * @returns {Object} tag
+ */
 exports.getSingleTag = async (tagId) => {
   try {
     const tag = await Tag.findOne({ _id: tagId });
 
-    if (!tag) {
-      return Promise.reject({
-        statusCode: NOT_FOUND,
-        message: "Tag not found. Please try again later.",
-      });
-    }
+    if (!tag) throw new Error("Tags not found. Please try again later.");
+
     return Promise.resolve(tag);
   } catch (err) {
     logger.error(

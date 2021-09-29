@@ -21,7 +21,7 @@ describe("Member Service Tests", function () {
     lastName: "Dummy",
     memberType: "EMPLOYEE",
     role: "role",
-    contractDuration: "2 months",
+    contractDuration: 2,
   };
 
   it("should create new member if the input meets the defined schema.", async function () {
@@ -30,21 +30,6 @@ describe("Member Service Tests", function () {
     const response = await addNewMember(memberInput);
 
     expect(response).to.exist;
-  });
-
-  it("should fail to create new member if member type is not specified.", async function () {
-    const memberInputForFailure = {
-      firstName: "Dummy",
-      lastName: "Dummy",
-      role: "role",
-      memberType: null,
-      contractDuration: "2 months",
-    };
-
-    try {
-    } catch (err) {
-      await addNewMember(memberInputForFailure);
-    }
   });
 
   it("should successfully update tag for member", async function () {
